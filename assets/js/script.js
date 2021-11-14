@@ -1,19 +1,32 @@
-var today = moment();
-$("#todays-date").text(today.format("dddd, MMM Do, YYYY"));
+$(init);
 
-var hours = document.querySelectorAll(".hour")
-
-for (var i = 0; i < hours.length; i++) {
-    console.log(hours[i].textContent)
-    var timeString = hours[i].textContent;
-    var timeHours = moment(timeString, "hhA");
-    today.isAfter(timeHours);
-    console.log(today.isAfter(timeHours))
-    //is same
-    //is before
-    //if statements
-    //jquery add css to from div to textarea
+function init() {
+  $("#todays-date").text(moment().format("dddd, MMMM Do YYYY"));
+  colorBlocks();
+  setInterval(colorBlocks, 60000);
+  $(".time-block").each(function () {
+    var blockId = $(this).attr("id");
+    $("#" + blockId + " textarea").text(localStorage.getItem(moment().format("DDDYYYY") + blockId));
+  });
+  $(".saveBtn").on("click", saveBlock);
 }
 
-//local storage
+function colorBlocks() {
+  $(".time-block").each(function () {
+    var blockHour = parseInt($(this).attr("id").replace("hour-", ""));
+    var currentHour = parseInt(moment().format("H"));
+    $(this).removeClass("past present future");
+    if (blockHour < currentHour) {
+      $(this).addClass("past");
+    } else if (blockHour > currentHour) {
+      $(this).addClass("future");
+    } else {
+      $(this).addClass("present");
+    }
+  });
+}
 
+function saveBlock(event) {
+    var hourId = $(this).parent().attr("id");
+    localStorage.setItem(moment().format("DDDYYYY") + hourId, $("#" + hourId + " textarea").val());
+  }
